@@ -15,6 +15,14 @@ class Character : public GameObject {
 
     void
     moveDown(int px_step);
+
+    int getX() const;
+
+    int getWidth() const;
+
+    SDL_Rect getRect() const;
+
+    void setX(int x);
   
   protected:
     Character(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect &&texture_rect, std::string &&texture_path);
