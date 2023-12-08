@@ -15,15 +15,15 @@ public:
         SDL_FreeSurface(tempSurface);
 
         // Load the start button image
-        tempSurface = IMG_Load("./src/textures/button-start.png"); // Adjust the filename as needed
+        tempSurface = IMG_Load("./src/textures/button-start.png");
         buttonTexture_ = SDL_CreateTextureFromSurface(renderer, tempSurface);
         SDL_FreeSurface(tempSurface);
 
         // Adjust the position and size of the button
-        startButton_.x = 300; // Change as needed
-        startButton_.y = 300; // Change as needed
-        startButton_.w = 200; // Adjust to match the button image's width
-        startButton_.h = 50;  // Adjust to match the button image's height
+        startButton_.x = 300; 
+        startButton_.y = 300;
+        startButton_.w = 200; 
+        startButton_.h = 50;  
     }
 
     ~MenuState() {
@@ -167,13 +167,11 @@ void Game::Play() noexcept {
         }
         else if (!gameOver) {
             // Normal game logic
-            // Add your game update logic here (e.g., moving players and enemies)
 
-            // Check for collisions between players and enemies
             for (const auto& player : players_) {
                 for (const auto& enemy : enemies_) {
-                    SDL_Rect enemyRect = enemy->getRect(); // Assuming getRect() returns SDL_Rect of enemy
-                    SDL_Rect playerRect = player->getRect(); // Assuming getRect() returns SDL_Rect of player
+                    SDL_Rect enemyRect = enemy->getRect(); 
+                    SDL_Rect playerRect = player->getRect(); 
 
                     if (SDL_HasIntersection(&playerRect, &enemyRect)) {
                         gameOver = true; // Set game over flag if collision detected
