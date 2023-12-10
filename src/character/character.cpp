@@ -48,5 +48,5 @@ void Character::setX(int x) {
 }
 
 SDL_Rect Character::getRect() const {
-    return texture_rect_; // Assuming texture_rect_ is the SDL_Rect representing the character
+    return texture_rect_; 
 }

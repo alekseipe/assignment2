@@ -4,7 +4,9 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include "include/gameover_state.hpp"
-
+#include <Windows.h>
+#include "SDL2/SDL_syswm.h"
+#include "C:\Users\peral\Desktop\assignment\resource.h"
 
 class MenuState {
 public:
@@ -68,6 +70,33 @@ private:
     }
 };
 
+void CreateWin32Menu(SDL_Window* sdlWindow) {
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    if (!SDL_GetWindowWMInfo(sdlWindow, &wmInfo)) {
+        return; // Handle the error appropriately
+    }
+
+    HMENU hMenu = CreateMenu();
+
+    // File Menu
+    HMENU hFileMenu = CreatePopupMenu();
+    AppendMenu(hFileMenu, MF_STRING, 1, "Restart Game");
+    AppendMenu(hFileMenu, MF_STRING, 2, "Exit Application");
+    AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hFileMenu, "File");
+
+    // Game Controls
+    AppendMenu(hMenu, MF_STRING, 3, "Game Controls");
+
+    // Help Menu
+    HMENU hHelpMenu = CreatePopupMenu();
+    AppendMenu(hHelpMenu, MF_STRING, 4, "About YourEngineName");
+    AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hHelpMenu, "Help");
+
+    SetMenu(wmInfo.info.win.window, hMenu);
+}
+
+
 Game::Game(const std::string name, int window_width, int window_height)
     : window_width_(window_width), window_height_(window_height), name_(std::move(name)), window_(nullptr), renderer_(nullptr) {
     if (SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -87,6 +116,7 @@ Game::Game(const std::string name, int window_width, int window_height)
         SDL_Quit();
         exit(1);
     }
+    CreateWin32Menu(window_);
 }
 
 Game::~Game() {
@@ -101,14 +131,46 @@ void Game::Play() noexcept {
     bool inMenu = true; // Flag for menu state
     GameOverState gameOverState(renderer_); // Initialize the game over state
     MenuState menuState(renderer_); // Initialize the menu state
-
+    
     SDL_Event event; // Event variable for handling events
 
     while (running) { // Main game loop
+
+        // Inside your main game loop or message handling loop
+        MSG msg;
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+
+            if (msg.message == WM_COMMAND) {
+                switch (LOWORD(msg.wParam)) {
+                case ID_FILE_RESTARTGAME:
+                    // Add the logic to restart the game here
+                    MessageBox(nullptr, "The game will restart now.", "Restart Game", MB_OK);
+                    break;
+                case ID_HELP_ABOUTTHEENGINE:
+                    MessageBox(nullptr, "YourEngineName is a powerful SDL2-based C++ 2D game engine.\n\nDeveloped by [Your Name], 2022.", "About YourEngineName", MB_OK);
+                    break;
+                case ID_WARNING_AGERESTRICTIONS:
+                    MessageBox(nullptr, "Please note that this game may not be suitable for all ages. Player discretion is advised.", "Age Restrictions", MB_OK);
+                    break;
+                case ID_WARNING_MEDICALCONDITIONS:
+                    MessageBox(nullptr, "Warning: This game contains flashing lights that may cause discomfort or seizures for people with photosensitive epilepsy. Player discretion is advised.", "Medical Conditions Warning", MB_OK);
+                    break;
+                case ID_FILE_EXIT:
+                    MessageBox(nullptr, "The application will now close.", "Exit Application", MB_OK);
+                    running = false;
+                    break;
+                }
+            }
+        }
         while (SDL_PollEvent(&event)) { // Event polling
             if (event.type == SDL_QUIT) { // Check for quit event
                 running = false; // Set running to false to exit the loop
             }
+
+
+
 
             if (inMenu) {
                 // Handle menu-specific events
@@ -158,6 +220,7 @@ void Game::Play() noexcept {
                 gameOverState.HandleEvents(event, running, gameOver);
             }
         }
+
 
         if (inMenu) {
             // Menu rendering

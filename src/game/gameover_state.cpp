@@ -24,7 +24,7 @@ GameOverState::GameOverState(SDL_Renderer* renderer) : renderer_(renderer), font
     }
 
     messageTexture_ = SDL_CreateTextureFromSurface(renderer_, textSurface);
-    messageRect_ = { 100, 100, textSurface->w, textSurface->h }; // Adjust position and size
+    messageRect_ = { 100, 100, textSurface->w, textSurface->h };
 
     SDL_FreeSurface(textSurface);
 }
