@@ -6,7 +6,6 @@
 #include "include/gameover_state.hpp"
 #include <Windows.h>
 #include "SDL2/SDL_syswm.h"
-#include "C:\Users\peral\Desktop\assignment\resource.h"
 
 class MenuState {
 public:
@@ -90,12 +89,16 @@ void CreateWin32Menu(SDL_Window* sdlWindow) {
 
     // Help Menu
     HMENU hHelpMenu = CreatePopupMenu();
-    AppendMenu(hHelpMenu, MF_STRING, 4, "About YourEngineName");
+    AppendMenu(hHelpMenu, MF_STRING, 4, "About AlekseiPerov engine");
     AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hHelpMenu, "Help");
+    //Warning Menu
 
+    HMENU hWarningMenu = CreatePopupMenu();
+    AppendMenu(hWarningMenu, MF_STRING, 5, "Medical warning");
+    AppendMenu(hWarningMenu, MF_STRING, 6, "Age restrictions");
+    AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hWarningMenu, "Warning");
     SetMenu(wmInfo.info.win.window, hMenu);
 }
-
 
 Game::Game(const std::string name, int window_width, int window_height)
     : window_width_(window_width), window_height_(window_height), name_(std::move(name)), window_(nullptr), renderer_(nullptr) {
@@ -117,7 +120,10 @@ Game::Game(const std::string name, int window_width, int window_height)
         exit(1);
     }
     CreateWin32Menu(window_);
+
+
 }
+
 
 Game::~Game() {
     SDL_DestroyRenderer(renderer_);
@@ -135,34 +141,50 @@ void Game::Play() noexcept {
     SDL_Event event; // Event variable for handling events
 
     while (running) { // Main game loop
+        std::cout << "start" << "\n";
 
         // Inside your main game loop or message handling loop
         MSG msg;
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            std::cout << "in menu loop" << "\n";
+
             TranslateMessage(&msg);
             DispatchMessage(&msg);
 
+            // Inside your message handling loop
             if (msg.message == WM_COMMAND) {
                 switch (LOWORD(msg.wParam)) {
-                case ID_FILE_RESTARTGAME:
-                    // Add the logic to restart the game here
+                case 1: // Restart Game
                     MessageBox(nullptr, "The game will restart now.", "Restart Game", MB_OK);
+                    // Add the logic to restart the game here
                     break;
-                case ID_HELP_ABOUTTHEENGINE:
-                    MessageBox(nullptr, "YourEngineName is a powerful SDL2-based C++ 2D game engine.\n\nDeveloped by [Your Name], 2022.", "About YourEngineName", MB_OK);
+                case 2: // Exit Application
+                    MessageBox(nullptr, "The application will now close.", "Exit Application", MB_OK);
+                    running = false; // This will exit the main game loop
                     break;
-                case ID_WARNING_AGERESTRICTIONS:
-                    MessageBox(nullptr, "Please note that this game may not be suitable for all ages. Player discretion is advised.", "Age Restrictions", MB_OK);
+                case 3: // Game Controls
+                    MessageBox(nullptr,
+                        "Game Controls:\n\n"
+                        "- To Start Press 'S'\n"
+                        "- Move Right: Press 'D' or Right Arrow Key\n"
+                        "- Move Left: Press 'A' or Left Arrow Key\n"
+                        "- Move Up: Press 'W' or Up Arrow Key\n"
+                        "- Move Down: Press 'S' or Down Arrow Key\n\n"
+                        "Navigate your character through the game using these controls.",
+                        "Game Controls", MB_OK);
                     break;
-                case ID_WARNING_MEDICALCONDITIONS:
+                case 4: // About YourEngineName
+                    MessageBox(nullptr, "YourEngineName is a powerful SDL2-based C++ 2D game engine.\n\nDeveloped by Aleksei Perov, 2023.", "About My Engine", MB_OK);
+                    break;
+                case 5: // Medical warning
                     MessageBox(nullptr, "Warning: This game contains flashing lights that may cause discomfort or seizures for people with photosensitive epilepsy. Player discretion is advised.", "Medical Conditions Warning", MB_OK);
                     break;
-                case ID_FILE_EXIT:
-                    MessageBox(nullptr, "The application will now close.", "Exit Application", MB_OK);
-                    running = false;
+                case 6: // Age restrictions
+                    MessageBox(nullptr, "Please note that this game may not be suitable for all ages. Player discretion is advised.", "Age Restrictions", MB_OK);
                     break;
                 }
             }
+
         }
         while (SDL_PollEvent(&event)) { // Event polling
             if (event.type == SDL_QUIT) { // Check for quit event
