@@ -101,6 +101,9 @@
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)ExternalLibs\StaticLibs\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)ExternalLibs\DynamicLibs\*.dll" "$(Project Dir)$(Platform)\$(Configuration)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -136,12 +139,17 @@
     <ClCompile Include="src\game_object\game_object.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="menu.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\game\include\gameover_state.hpp" />
     <ClInclude Include="src\character\enemy\include\enemy.hpp" />
     <ClInclude Include="src\character\include\character.hpp" />
     <ClInclude Include="src\character\player\include\player.hpp" />
     <ClInclude Include="src\game\include\game.hpp" />
     <ClInclude Include="src\game_object\include\game_object.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
