@@ -6,6 +6,7 @@
 #include "include/gameover_state.hpp"
 #include <Windows.h>
 #include "SDL2/SDL_syswm.h"
+#include "../collectables/include/collectable.hpp"
 
 class MenuState {
 public:
@@ -120,8 +121,41 @@ Game::Game(const std::string name, int window_width, int window_height)
         exit(1);
     }
     CreateWin32Menu(window_);
+    SDL_Surface* bgSurface = IMG_Load("./src/textures/grass_field.png");
+    backgroundTexture = SDL_CreateTextureFromSurface(renderer_, bgSurface);
+    SDL_FreeSurface(bgSurface);
+    Collectable healthCollectable(renderer_, 200, 200); // Position at (200, 200)
 
 
+}
+
+void renderHealth(SDL_Renderer* renderer, int health) {
+    TTF_Font* font_ = TTF_OpenFont("./src/textures/PixelRpgFont-Regular.ttf", 28); 
+
+    // Convert health to string
+    std::string healthText = "Health: " + std::to_string(health);
+
+    // Render the text to a surface
+    SDL_Color textColor = { 255, 255, 255 }; // White color
+    SDL_Surface* textSurface = TTF_RenderText_Solid(font_, healthText.c_str(), textColor);
+    if (textSurface == nullptr) {
+        std::cerr << "Unable to render text surface! SDL_ttf Error: " << TTF_GetError() << std::endl;
+        return;
+    }
+
+    // Create texture from surface pixels
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    if (textTexture == nullptr) {
+        std::cerr << "Unable to create texture from rendered text! SDL Error: " << SDL_GetError() << std::endl;
+    }
+
+    // Render the texture
+    SDL_Rect renderQuad = { 0, 0, textSurface->w, textSurface->h };
+    SDL_RenderCopy(renderer, textTexture, nullptr, &renderQuad);
+
+    // Clean up
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
 }
 
 
@@ -129,6 +163,8 @@ Game::~Game() {
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);
     SDL_Quit();
+    SDL_DestroyTexture(backgroundTexture);
+
 }
 
 void Game::Play() noexcept {
@@ -223,9 +259,18 @@ void Game::Play() noexcept {
 
                     case SDLK_s:
                     case SDLK_DOWN:
-
                         for (auto& player : players_)
                             player->moveDown(10);
+                        break;
+                    case SDLK_SPACE:
+                        for (auto& character : players_) {
+                            Player* player = dynamic_cast<Player*>(character.get()); 
+                            if (player) {
+                                std::cout << "shoot" << "\n";
+
+                                player->shoot(renderer_);
+                            }
+                        }
                         break;
                     }
                 } else if (event.type == SDL_KEYUP) {
@@ -239,7 +284,7 @@ void Game::Play() noexcept {
                     case SDLK_s:
                     case SDLK_DOWN:
                         for (auto& character : players_) {
-                            Player* player = dynamic_cast<Player*>(character.get()); // Assuming players_ stores pointers
+                            Player* player = dynamic_cast<Player*>(character.get());
                             if (player) {
                                 player->stopMoving();
                             }
@@ -279,7 +324,7 @@ void Game::Play() noexcept {
                 }
             }
             for (auto& enemy : enemies_) {
-                enemy->moveLeft(1); // Adjust this value for speed
+                enemy->moveDown(1); // Adjust this value for speed
 
                 // Check if the enemy has moved past the left edge of the screen
                 if (enemy->getX() + enemy->getWidth() < 0) {
@@ -290,8 +335,21 @@ void Game::Play() noexcept {
 
             // Render updates
             SDL_RenderClear(renderer_);
+
+            SDL_RenderCopy(renderer_, backgroundTexture, nullptr, nullptr);
+
             for (const auto& player : players_) {
                // player->updateTexturePos(renderer_);
+                for (auto& character : players_) {
+                    Player* player = dynamic_cast<Player*>(character.get()); 
+                    if (player) {
+                        player->updateProjectiles();
+                        player->renderProjectiles(renderer_);
+
+                        renderHealth(renderer_, player->getHealth());
+                    }
+                }
+
                 player->animateSprite(renderer_);
             }
             for (const auto& enemy : enemies_) {

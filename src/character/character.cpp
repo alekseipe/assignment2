@@ -47,6 +47,7 @@ void Character::setX(int x) {
     texture_rect_.x = x;
 }
 
+
 SDL_Rect Character::getRect() const {
     return texture_rect_; 
 }

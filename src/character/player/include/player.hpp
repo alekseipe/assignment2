@@ -2,6 +2,8 @@
 
 #include "../../include/character.hpp"
 #include <map>
+#include <vector>
+#include "../../projectile/include/projectile.hpp"
 
 class Player final : public Character {
   public:
@@ -18,7 +20,11 @@ class Player final : public Character {
   bool isMoving() const;
   void setIdleState();
   void stopMoving();
-
+  int getHealth() const;
+  void setHealth(int health);
+  void shoot(SDL_Renderer* renderer);
+  void updateProjectiles();
+  void renderProjectiles(SDL_Renderer* renderer);
 
 
 private:
@@ -28,4 +34,8 @@ private:
     SDL_Texture* current_texture_; // Current texture in use
     std::string last_direction_; // Add this member to track the last direction
     bool moving_;
+    int health_;
+    std::vector<Projectile*> projectiles_;
+
+
 };

@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\character\projectile\projectile.cpp" />
     <ClCompile Include="src\game\gameover_state.cpp" />
     <ClCompile Include="game_main.cpp" />
     <ClCompile Include="src\character\character.cpp" />
@@ -139,6 +140,7 @@
     <ClCompile Include="src\game_object\game_object.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\character\projectile\include\projectile.hpp" />
     <ClInclude Include="src\game\include\gameover_state.hpp" />
     <ClInclude Include="src\character\enemy\include\enemy.hpp" />
     <ClInclude Include="src\character\include\character.hpp" />

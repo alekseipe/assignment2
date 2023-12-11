@@ -21,7 +21,7 @@ Player::Player(SDL_Window* window, SDL_Renderer* renderer, SDL_Rect texture_rect
 
     // Set the current texture to the initial texture
     current_texture_ = textures_["right_idle"];
-
+    setHealth(3);
 
 }
 
@@ -134,4 +134,37 @@ bool Player::isMoving() const {
 void Player::stopMoving() {
     moving_ = false;
     setIdleState();
+}
+int Player::getHealth() const {
+    return health_;
+}
+
+void Player::setHealth(int health) {
+    health_ = health;
+}
+
+void Player::shoot(SDL_Renderer* renderer) {
+    int projectileStartX = texture_rect_.x + texture_rect_.w; // Right side of the player
+    int projectileStartY = texture_rect_.y + texture_rect_.h / 2; // Vertically centered
+
+    projectiles_.push_back(new Projectile(renderer, projectileStartX, projectileStartY));
+}
+
+void Player::updateProjectiles() {
+    for (auto it = projectiles_.begin(); it != projectiles_.end();) {
+        (*it)->move(5); // Adjust speed as needed
+        if ((*it)->isOffScreen(window_w_, window_h_)) {
+            delete* it;
+            it = projectiles_.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+}
+
+void Player::renderProjectiles(SDL_Renderer* renderer) {
+    for (auto& projectile : projectiles_) {
+        projectile->render(renderer);
+    }
 }

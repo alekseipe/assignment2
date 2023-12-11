@@ -9,7 +9,7 @@ GameOverState::GameOverState(SDL_Renderer* renderer) : renderer_(renderer), font
     }
 
     // Load font
-    font_ = TTF_OpenFont("./src/textures/daisy-roots.ttf", 28); // Replace with your font path and size
+    font_ = TTF_OpenFont("./src/textures/PixelRpgFont-Regular.ttf", 28);
     if (font_ == nullptr) {
         std::cerr << "Failed to load font! SDL_ttf Error: " << TTF_GetError() << std::endl;
         return;

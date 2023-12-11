@@ -29,6 +29,8 @@ class Game final {
     std::vector<std::unique_ptr<Character>> players_, enemies_;
     SDL_Window *window_;
     SDL_Renderer *renderer_;
+    SDL_Texture* backgroundTexture;
+
 };
 
 template <typename CharType>
