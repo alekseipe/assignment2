@@ -141,13 +141,10 @@ void Game::Play() noexcept {
     SDL_Event event; // Event variable for handling events
 
     while (running) { // Main game loop
-        std::cout << "start" << "\n";
 
         // Inside your main game loop or message handling loop
         MSG msg;
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-            std::cout << "in menu loop" << "\n";
-
             TranslateMessage(&msg);
             DispatchMessage(&msg);
 
@@ -280,7 +277,8 @@ void Game::Play() noexcept {
             // Render updates
             SDL_RenderClear(renderer_);
             for (const auto& player : players_) {
-                player->updateTexturePos(renderer_);
+               // player->updateTexturePos(renderer_);
+                player->animateSprite(renderer_);
             }
             for (const auto& enemy : enemies_) {
                 enemy->updateTexturePos(renderer_);

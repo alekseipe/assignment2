@@ -23,6 +23,9 @@ class Character : public GameObject {
     SDL_Rect getRect() const;
 
     void setX(int x);
+
+    void
+        animateSprite(SDL_Renderer* renderer) noexcept override;
   
   protected:
     Character(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect &&texture_rect, std::string &&texture_path);

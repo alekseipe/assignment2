@@ -10,6 +10,8 @@ class GameObject {
     void
     updateTexturePos(SDL_Renderer *renderer) noexcept;
 
+    virtual void
+        animateSprite(SDL_Renderer* renderer) noexcept = 0;
   protected:
     GameObject(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect &&texture_rect, std::string &&texture_path);
 

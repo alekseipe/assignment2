@@ -50,3 +50,7 @@ void Character::setX(int x) {
 SDL_Rect Character::getRect() const {
     return texture_rect_; 
 }
+
+void
+Character::animateSprite(SDL_Renderer* renderer) noexcept
+{}
