@@ -22,3 +22,4 @@ void
 GameObject::updateTexturePos(SDL_Renderer *renderer) noexcept {
   SDL_RenderCopy(renderer, texture_, nullptr, &texture_rect_);
 }
+

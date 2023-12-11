@@ -4,16 +4,16 @@
 
 class Character : public GameObject {
   public:
-    void
+    virtual  void
     moveLeft(int px_step);
 
-    void
+    virtual void
     moveRight(int px_step);
 
-    void
+    virtual  void
     moveUp(int px_step);
 
-    void
+    virtual  void
     moveDown(int px_step);
 
     int getX() const;
@@ -24,8 +24,8 @@ class Character : public GameObject {
 
     void setX(int x);
 
-    void
-        animateSprite(SDL_Renderer* renderer) noexcept override;
+    
+    void animateSprite(SDL_Renderer* renderer) noexcept override;
   
   protected:
     Character(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect &&texture_rect, std::string &&texture_path);

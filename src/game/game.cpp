@@ -137,7 +137,6 @@ void Game::Play() noexcept {
     bool inMenu = true; // Flag for menu state
     GameOverState gameOverState(renderer_); // Initialize the game over state
     MenuState menuState(renderer_); // Initialize the menu state
-    
     SDL_Event event; // Event variable for handling events
 
     while (running) { // Main game loop
@@ -170,8 +169,8 @@ void Game::Play() noexcept {
                         "Navigate your character through the game using these controls.",
                         "Game Controls", MB_OK);
                     break;
-                case 4: // About YourEngineName
-                    MessageBox(nullptr, "YourEngineName is a powerful SDL2-based C++ 2D game engine.\n\nDeveloped by Aleksei Perov, 2023.", "About My Engine", MB_OK);
+                case 4: // About The Engine
+                    MessageBox(nullptr, "The Engine is a powerful SDL2-based C++ 2D game engine.\n\nDeveloped by Aleksei Perov, 2023.", "About My Engine", MB_OK);
                     break;
                 case 5: // Medical warning
                     MessageBox(nullptr, "Warning: This game contains flashing lights that may cause discomfort or seizures for people with photosensitive epilepsy. Player discretion is advised.", "Medical Conditions Warning", MB_OK);
@@ -187,9 +186,6 @@ void Game::Play() noexcept {
             if (event.type == SDL_QUIT) { // Check for quit event
                 running = false; // Set running to false to exit the loop
             }
-
-
-
 
             if (inMenu) {
                 // Handle menu-specific events
@@ -230,6 +226,24 @@ void Game::Play() noexcept {
 
                         for (auto& player : players_)
                             player->moveDown(10);
+                        break;
+                    }
+                } else if (event.type == SDL_KEYUP) {
+                    switch (event.key.keysym.sym) {
+                    case SDLK_d:
+                    case SDLK_RIGHT:
+                    case SDLK_a:
+                    case SDLK_LEFT:
+                    case SDLK_w:
+                    case SDLK_UP:
+                    case SDLK_s:
+                    case SDLK_DOWN:
+                        for (auto& character : players_) {
+                            Player* player = dynamic_cast<Player*>(character.get()); // Assuming players_ stores pointers
+                            if (player) {
+                                player->stopMoving();
+                            }
+                        }
                         break;
                     }
                 }
