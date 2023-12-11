@@ -124,7 +124,6 @@ Game::Game(const std::string name, int window_width, int window_height)
     SDL_Surface* bgSurface = IMG_Load("./src/textures/grass_field.png");
     backgroundTexture = SDL_CreateTextureFromSurface(renderer_, bgSurface);
     SDL_FreeSurface(bgSurface);
-    Collectable healthCollectable(renderer_, 200, 200); // Position at (200, 200)
 
 
 }
@@ -174,6 +173,7 @@ void Game::Play() noexcept {
     GameOverState gameOverState(renderer_); // Initialize the game over state
     MenuState menuState(renderer_); // Initialize the menu state
     SDL_Event event; // Event variable for handling events
+    Collectable healthCollectable(renderer_, 200, 200); // Position at (200, 200)
 
     while (running) { // Main game loop
 
@@ -310,6 +310,14 @@ void Game::Play() noexcept {
             // Normal game logic
 
             for (const auto& player : players_) {
+
+       //         if (!healthCollectable.isCollected() && SDL_HasIntersection(player->getRect(), &healthCollectable.getRect())) {
+      //              healthCollectable.collect();
+             //       player->setHealth(player->getHealth() + 1); // Increase player's health by 1
+        //        }
+
+                // Render collectable
+                
                 for (const auto& enemy : enemies_) {
                     SDL_Rect enemyRect = enemy->getRect(); 
                     SDL_Rect playerRect = player->getRect(); 
@@ -333,9 +341,10 @@ void Game::Play() noexcept {
                 }
             }
 
+
             // Render updates
             SDL_RenderClear(renderer_);
-
+            healthCollectable.render(renderer_);
             SDL_RenderCopy(renderer_, backgroundTexture, nullptr, nullptr);
 
             for (const auto& player : players_) {

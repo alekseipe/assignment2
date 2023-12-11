@@ -39,6 +39,9 @@
     <ClCompile Include="src\character\projectile\projectile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\collectables\collectable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\character\enemy\include\enemy.hpp">
@@ -60,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\character\projectile\include\projectile.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collectables\include\collectable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
