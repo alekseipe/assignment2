@@ -55,3 +55,15 @@ SDL_Rect Character::getRect() const {
 void
 Character::animateSprite(SDL_Renderer* renderer) noexcept
 {}
+
+
+int Character::getHealth() const {
+    return health_;
+}
+
+void Character::setHealth(int health) {
+    health_ = health;
+}
+
+void Character::death(SDL_Renderer* renderer) {
+}

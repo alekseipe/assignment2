@@ -6,6 +6,8 @@
 Player::Player(SDL_Window* window, SDL_Renderer* renderer, SDL_Rect texture_rect, std::string texture_path)
     : Character(window, renderer, std::move(texture_rect), std::move(texture_path)),
     texture_path_(std::move(texture_path)) {
+    // In Enemy and Player constructors
+    death_texture_ = IMG_LoadTexture(renderer, "./src/textures/WarriorDeath.png");
 
 
     textures_["left"] = IMG_LoadTexture(renderer, "./src/textures/WarriorLeftWalk.png");
@@ -58,6 +60,8 @@ int GetImageWidth(const std::string& filePath) {
 void Player::animateSprite(SDL_Renderer* renderer) noexcept 
 {
     // Get the current time
+    isDead = false;
+
     Uint32 current_time = SDL_GetTicks();
     int imageWidth = GetImageWidth(texture_path_);
     int amountOfFrames = imageWidth / 48;
@@ -133,14 +137,6 @@ void Player::stopMoving() {
     setIdleState();
 }
 
-int Player::getHealth() const {
-    return health_;
-}
-
-void Player::setHealth(int health) {
-    health_ = health;
-}
-
 void Player::shoot(SDL_Renderer* renderer) {
     int projectileStartX = texture_rect_.x + texture_rect_.w; // Right side of the player
     int projectileStartY = texture_rect_.y + texture_rect_.h / 2; // Vertically centered
@@ -165,4 +161,17 @@ void Player::renderProjectiles(SDL_Renderer* renderer) {
     for (auto& projectile : projectiles_) {
         projectile->render(renderer);
     }
+}
+
+void Player::death(SDL_Renderer* renderer) {
+    SDL_RenderCopy(renderer, death_texture_, nullptr, &texture_rect_);
+
+    // You could add a delay here to display the texture for a set time
+    SDL_Delay(500); // Display death animation for 500 milliseconds
+
+    // Flag for deletion
+    isDead = true;
+}
+std::vector<Projectile*>& Player::getProjectiles() {
+    return projectiles_;
 }

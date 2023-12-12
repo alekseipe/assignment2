@@ -132,6 +132,38 @@ Game::Game(const std::string name, int window_width, int window_height)
 }
 
 
+void renderScore(SDL_Renderer* renderer, int score) {
+    TTF_Font* font_ = TTF_OpenFont("./src/textures/PixelRpgFont-Regular.ttf", 28);
+
+    // Convert health to string
+    std::string healthText = "Score: " + std::to_string(score);
+
+    // Render the text to a surface
+    SDL_Color textColor = { 255, 255, 255 }; // White color
+    SDL_Surface* textSurface = TTF_RenderText_Solid(font_, healthText.c_str(), textColor);
+    if (textSurface == nullptr) {
+        std::cerr << "Unable to render text surface! SDL_ttf Error: " << TTF_GetError() << std::endl;
+        return;
+    }
+
+    // Create texture from surface pixels
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    if (textTexture == nullptr) {
+        std::cerr << "Unable to create texture from rendered text! SDL Error: " << SDL_GetError() << std::endl;
+    }
+
+    // Render the texture
+    SDL_Rect renderQuad = { 200, 0, textSurface->w, textSurface->h };
+    SDL_RenderCopy(renderer, textTexture, nullptr, &renderQuad);
+
+    // Clean up
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
+}
+
+
+
+
 void renderHealth(SDL_Renderer* renderer, int health) {
     TTF_Font* font_ = TTF_OpenFont("./src/textures/PixelRpgFont-Regular.ttf", 28); 
 
@@ -178,6 +210,7 @@ bool Game::Play() noexcept {
     MenuState menuState(renderer_); // Initialize the menu state
     SDL_Event event; // Event variable for handling events
     Collectable healthCollectable(renderer_, 200, 250); // Position at (200, 200)
+    int score = 0;
 
     while (running) { // Main game loop
         healthCollectable.render(renderer_);
@@ -347,8 +380,15 @@ bool Game::Play() noexcept {
                     SDL_Rect playerRect = player->getRect(); 
 
                     if (SDL_HasIntersection(&playerRect, &enemyRect)) {
-                        gameOver = true; // Set game over flag if collision detected
-                        break; // Break out of inner loop
+                        if ((player->getHealth() > 0)) {
+                            player->setHealth(player->getHealth() - 1); // Increase player's health by 1
+                            enemy->death(renderer_);
+                        }
+                        if ((player->getHealth() == 0)) {
+                            gameOver = true; 
+                            break;
+                        }
+                        
                     }
                 }
                 if (gameOver) {
@@ -370,24 +410,64 @@ bool Game::Play() noexcept {
             SDL_RenderClear(renderer_);
             SDL_RenderCopy(renderer_, backgroundTexture, nullptr, nullptr);
             healthCollectable.render(renderer_);
-
             for (const auto& player : players_) {
-               // player->updateTexturePos(renderer_);
-                for (auto& character : players_) {
-                    Player* player = dynamic_cast<Player*>(character.get()); 
-                    if (player) {
-                        player->updateProjectiles();
-                        player->renderProjectiles(renderer_);
+                Player* playerPtr = dynamic_cast<Player*>(player.get());
+                if (playerPtr) {
+                    playerPtr->updateProjectiles();
+                    renderHealth(renderer_, player->getHealth());
+                    renderScore(renderer_, score);
 
-                        renderHealth(renderer_, player->getHealth());
+                    // Check for collisions between projectiles and enemies
+                    auto& projectiles = playerPtr->getProjectiles(); // Assume this method exists and returns a reference to the projectiles vector
+                    for (auto projIt = projectiles.begin(); projIt != projectiles.end();) {
+                        bool projectileHit = false;
+                        SDL_Rect projectileRect = (*projIt)->getRect(); // Assume getRect() gives the SDL_Rect of the projectile
+
+                        for (auto enemyIt = enemies_.begin(); enemyIt != enemies_.end();) {
+                            Enemy* enemy = dynamic_cast<Enemy*>(enemyIt->get());
+                            if (enemy) {
+                                SDL_Rect enemyRect = enemy->getRect();  // Store the result in a local variable
+                                if (SDL_HasIntersection(&projectileRect, &enemyRect)) {
+                                    enemy->death(renderer_);
+                                    score++;
+                                    projectileHit = true;
+                                    enemyIt = enemies_.erase(enemyIt);  // Remove the enemy
+                                    break;  // Assuming one projectile can only hit one enemy
+                                }
+                                else {
+                                    ++enemyIt;
+                                }
+                            }
+                        }
+
+                        if (projectileHit) {
+                            delete* projIt;  // Delete the projectile
+                            projIt = projectiles.erase(projIt);  // Remove it from the vector
+                        }
+                        else {
+                            ++projIt;
+                        }
                     }
-                }
 
-                player->animateSprite(renderer_);
+                    // Render player and projectiles
+                    playerPtr->renderProjectiles(renderer_);
+                    playerPtr->animateSprite(renderer_);
+                }
             }
-            for (const auto& enemy : enemies_) {
-                enemy->animateSprite(renderer_);
+
+            for (auto it = enemies_.begin(); it != enemies_.end();) {
+                Enemy* enemy = dynamic_cast<Enemy*>(it->get());
+                if (enemy && enemy->isDead) {
+                    it = enemies_.erase(it); // Remove the enemy
+                }
+                else {
+                    if (enemy) {
+                        enemy->animateSprite(renderer_);
+                    }
+                    ++it;
+                }
             }
+
             SDL_RenderPresent(renderer_);
         }
         else {

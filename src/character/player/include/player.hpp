@@ -20,12 +20,11 @@ class Player final : public Character {
   bool isMoving() const;
   void setIdleState();
   void stopMoving();
-  int getHealth() const;
-  void setHealth(int health);
   void shoot(SDL_Renderer* renderer);
   void updateProjectiles();
   void renderProjectiles(SDL_Renderer* renderer);
-
+  void death(SDL_Renderer* renderer) override;
+  std::vector<Projectile*>& getProjectiles();
 
 private:
     static inline size_t s_curr_frame_idx = 0;
@@ -34,8 +33,8 @@ private:
     SDL_Texture* current_texture_; // Current texture in use
     std::string last_direction_; // Add this member to track the last direction
     bool moving_;
-    int health_;
     std::vector<Projectile*> projectiles_;
+    SDL_Texture* death_texture_;
 
 
 };

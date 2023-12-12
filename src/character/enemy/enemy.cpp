@@ -1,7 +1,11 @@
 #include "include/enemy.hpp"
+#include <SDL2/SDL_image.h>
 
 Enemy::Enemy(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect texture_rect, std::string texture_path)
-  : Character(window, renderer, std::move(texture_rect), std::move(texture_path)) {}
+  : Character(window, renderer, std::move(texture_rect), std::move(texture_path)) {
+    death_texture_ = IMG_LoadTexture(renderer, "./src/textures/SkeletonKingLeftDeath.png");
+
+}
 
 
 static Uint32 last_frame_time1 = 0;
@@ -60,4 +64,14 @@ void Enemy::moveUp(int px_step) {
 void Enemy::moveDown(int px_step) {
     Character::moveDown(px_step);
 
+}
+
+void Enemy::death(SDL_Renderer* renderer) {
+    SDL_RenderCopy(renderer, death_texture_, nullptr, &texture_rect_);
+
+    // You could add a delay here to display the texture for a set time
+    SDL_Delay(1); // Display death animation for 500 milliseconds
+
+    // Flag for deletion
+    isDead = true;
 }

@@ -12,9 +12,10 @@ class Enemy final : public Character {
   void moveRight(int px_step) override;
   void moveUp(int px_step) override;
   void moveDown(int px_step) override;
-
+  void death(SDL_Renderer* renderer) override;
 
 private:
     static inline size_t s_curr_frame_idx = 0;
+    SDL_Texture* death_texture_;
 
 };

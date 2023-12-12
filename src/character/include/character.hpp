@@ -24,9 +24,19 @@ class Character : public GameObject {
 
     void setX(int x);
 
-    
+    virtual int getHealth() const;
+
+    virtual void setHealth(int health);
+
+    virtual void death(SDL_Renderer* renderer);
+
+    bool isDead = false;
+
     void animateSprite(SDL_Renderer* renderer) noexcept override;
   
+    private:
+     int health_;
+
   protected:
     Character(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect &&texture_rect, std::string &&texture_path);
 };
