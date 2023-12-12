@@ -128,7 +128,6 @@ Game::Game(const std::string name, int window_width, int window_height)
     backgroundTexture = SDL_CreateTextureFromSurface(renderer_, bgSurface);
     SDL_FreeSurface(bgSurface);
 
-
 }
 
 
@@ -212,6 +211,9 @@ bool Game::Play() noexcept {
     Collectable healthCollectable(renderer_, 200, 250); // Position at (200, 200)
     int score = 0;
 
+    Uint32 last_spawn_time = 0;
+    const Uint32 initial_spawn_delay = 1000;
+    Uint32 spawn_delay = initial_spawn_delay;
     while (running) { // Main game loop
         healthCollectable.render(renderer_);
 
@@ -355,6 +357,7 @@ bool Game::Play() noexcept {
         else if (!gameOver) {
             // Normal game logic
 
+
             for (const auto& player : players_) {
 
                 for (auto& character : players_) {
@@ -395,13 +398,14 @@ bool Game::Play() noexcept {
                     break; // Break out of outer loop if game over
                 }
             }
-            for (auto& character : enemies_) {
-                Enemy* enemy = dynamic_cast<Enemy*>(character.get());
-
-                enemy->updateMoveTimer(5); 
-                if (enemy->getX() + enemy->getWidth() < 0) {
-                    // Reposition the enemy to the right edge of the screen
-                    enemy->setX(window_width_);
+            for (auto& enemyPtr : enemies_) {
+                Enemy* enemy = dynamic_cast<Enemy*>(enemyPtr.get());
+                if (enemy) {
+                    enemy->updateMoveTimer(10); // Update enemy movement
+                    if (enemy->getX() + enemy->getWidth() < 0) {
+                        enemy->setX(window_width_); // Reposition the enemy to the right edge of the screen
+                    }
+                    enemy->animateSprite(renderer_); // Animate the enemy
                 }
             }
 
@@ -466,6 +470,20 @@ bool Game::Play() noexcept {
                     }
                     ++it;
                 }
+            }
+
+            Uint32 current_time = SDL_GetTicks();
+            if (current_time - last_spawn_time > spawn_delay) {
+                // Randomly generate Y position for the new enemy
+                int randomY = rand() % (window_height_ - 64); // Assuming enemyHeight is the height of your enemy sprite
+                AddCharacter<Enemy>(64, 64, window_width_ - 50, randomY, "./src/textures/SkeletonKingLeftAttack.png");
+
+                // Increase spawn rate over time for difficulty (optional)
+                if (spawn_delay > 50) {
+                    spawn_delay = spawn_delay - 5; // Decrease delay but not less than 500 ms
+                }
+
+                last_spawn_time = current_time;
             }
 
             SDL_RenderPresent(renderer_);

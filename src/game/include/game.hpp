@@ -20,7 +20,7 @@ class Game final {
     void
     AddCharacter(int w, int h, int x, int y, std::string texture_path);
 
-    bool
+    bool 
     Play() noexcept;
 
   private:

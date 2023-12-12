@@ -8,7 +8,7 @@ Enemy::Enemy(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect texture_rect, 
 }
 
 
-static Uint32 last_frame_time1 = 0;
+Uint32 last_frame_time1 = 0;
 
 const Uint32 frame_delay = 100;
 Uint32 last_move_time = 0;
@@ -40,15 +40,12 @@ void Enemy::animateSprite(SDL_Renderer* renderer) noexcept
 void Enemy::updateMoveTimer(int pix) {
     Uint32 current_time = SDL_GetTicks();
     if (current_time - last_move_time > move_delay) {
-        Character::moveLeft(1);
+        Character::moveLeft(pix);
         last_move_time = current_time;  // Reset the timer
     }
 }
 void Enemy::moveLeft(int px_step) {
     Character::moveLeft(px_step);
-   // current_texture_ = textures_["left"];
-   // last_direction_ = "left";
-  //  moving_ = true;
 }
 
 void Enemy::moveRight(int px_step) {
