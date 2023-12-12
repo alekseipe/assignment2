@@ -27,8 +27,7 @@ Player::Player(SDL_Window* window, SDL_Renderer* renderer, SDL_Rect texture_rect
 
 // Add a static variable to keep track of the time since the last frame update
 static Uint32 last_frame_time = 0;
-// Define the time interval (in milliseconds) between frame updates
-const Uint32 frame_delay = 100; // 100 ms between frames
+const Uint32 frame_delay = 100; 
 
 int GetImageWidth(const std::string& filePath) {
     // Initialize SDL_image
@@ -62,8 +61,6 @@ void Player::animateSprite(SDL_Renderer* renderer) noexcept
     Uint32 current_time = SDL_GetTicks();
     int imageWidth = GetImageWidth(texture_path_);
     int amountOfFrames = imageWidth / 48;
-
-    // Check if enough time has passed since the last frame update
     if (current_time - last_frame_time > frame_delay) {
         // Update the frame index
         s_curr_frame_idx = (s_curr_frame_idx + 1) % 4;
@@ -135,6 +132,7 @@ void Player::stopMoving() {
     moving_ = false;
     setIdleState();
 }
+
 int Player::getHealth() const {
     return health_;
 }
@@ -152,7 +150,7 @@ void Player::shoot(SDL_Renderer* renderer) {
 
 void Player::updateProjectiles() {
     for (auto it = projectiles_.begin(); it != projectiles_.end();) {
-        (*it)->move(5); // Adjust speed as needed
+        (*it)->move(1);
         if ((*it)->isOffScreen(window_w_, window_h_)) {
             delete* it;
             it = projectiles_.erase(it);

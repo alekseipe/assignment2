@@ -22,10 +22,10 @@ public:
         SDL_FreeSurface(tempSurface);
 
         // Adjust the position and size of the button
-        startButton_.x = 300; 
-        startButton_.y = 300;
-        startButton_.w = 200; 
-        startButton_.h = 50;  
+        startButton_.x = 0; 
+        startButton_.y = 0;
+        startButton_.w = 1000; 
+        startButton_.h = 1000;
     }
 
     ~MenuState() {
@@ -173,9 +173,10 @@ void Game::Play() noexcept {
     GameOverState gameOverState(renderer_); // Initialize the game over state
     MenuState menuState(renderer_); // Initialize the menu state
     SDL_Event event; // Event variable for handling events
-    Collectable healthCollectable(renderer_, 200, 200); // Position at (200, 200)
+    Collectable healthCollectable(renderer_, 200, 250); // Position at (200, 200)
 
     while (running) { // Main game loop
+        healthCollectable.render(renderer_);
 
         // Inside your main game loop or message handling loop
         MSG msg;
@@ -198,6 +199,7 @@ void Game::Play() noexcept {
                     MessageBox(nullptr,
                         "Game Controls:\n\n"
                         "- To Start Press 'S'\n"
+                        "- To Shoot Press 'Space'\n"
                         "- Move Right: Press 'D' or Right Arrow Key\n"
                         "- Move Left: Press 'A' or Left Arrow Key\n"
                         "- Move Up: Press 'W' or Up Arrow Key\n"
@@ -238,11 +240,13 @@ void Game::Play() noexcept {
                     case SDLK_d:
                     case SDLK_RIGHT:
 
-                        for (auto& player : players_)
-                            player->moveRight(10);
-
+                        for (auto& character : players_) {
+                            Player* player = dynamic_cast<Player*>(character.get());
+                            if (player) {
+                                player->moveRight(10);
+                            }
+                        }
                         break;
-
                     case SDLK_a:
                     case SDLK_LEFT:
 
@@ -266,8 +270,6 @@ void Game::Play() noexcept {
                         for (auto& character : players_) {
                             Player* player = dynamic_cast<Player*>(character.get()); 
                             if (player) {
-                                std::cout << "shoot" << "\n";
-
                                 player->shoot(renderer_);
                             }
                         }
@@ -311,12 +313,23 @@ void Game::Play() noexcept {
 
             for (const auto& player : players_) {
 
-       //         if (!healthCollectable.isCollected() && SDL_HasIntersection(player->getRect(), &healthCollectable.getRect())) {
-      //              healthCollectable.collect();
-             //       player->setHealth(player->getHealth() + 1); // Increase player's health by 1
-        //        }
+                for (auto& character : players_) {
+                    Player* player = dynamic_cast<Player*>(character.get());
+                    SDL_Rect playerRect = player->getRect();
+                    if (!healthCollectable.isCollected() && SDL_HasIntersection(&playerRect, healthCollectable.getRect())) {
+                        healthCollectable.collect();
+                        player->setHealth(player->getHealth() + 1); // Increase player's health by 1
+                    }
+                }
+               
+                for (auto& character : players_) {
+                    Player* player = dynamic_cast<Player*>(character.get());
+                    if (player) {
+                        player->stopMoving();
+                    }
+                }
 
-                // Render collectable
+
                 
                 for (const auto& enemy : enemies_) {
                     SDL_Rect enemyRect = enemy->getRect(); 
@@ -332,20 +345,20 @@ void Game::Play() noexcept {
                 }
             }
             for (auto& enemy : enemies_) {
-                enemy->moveDown(1); // Adjust this value for speed
+          //      enemy->moveDown(1); // Adjust this value for speed
 
                 // Check if the enemy has moved past the left edge of the screen
-                if (enemy->getX() + enemy->getWidth() < 0) {
+      //          if (enemy->getX() + enemy->getWidth() < 0) {
                     // Reposition the enemy to the right edge of the screen
-                    enemy->setX(window_width_);
-                }
+      //              enemy->setX(window_width_);
+       //         }
             }
 
 
             // Render updates
             SDL_RenderClear(renderer_);
-            healthCollectable.render(renderer_);
             SDL_RenderCopy(renderer_, backgroundTexture, nullptr, nullptr);
+            healthCollectable.render(renderer_);
 
             for (const auto& player : players_) {
                // player->updateTexturePos(renderer_);
