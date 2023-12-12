@@ -30,6 +30,7 @@ class Game final {
     SDL_Window *window_;
     SDL_Renderer *renderer_;
     SDL_Texture* backgroundTexture;
+    void Restart();
 
 };
 

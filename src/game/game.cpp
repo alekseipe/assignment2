@@ -98,6 +98,9 @@ void CreateWin32Menu(SDL_Window* sdlWindow) {
     AppendMenu(hWarningMenu, MF_STRING, 5, "Medical warning");
     AppendMenu(hWarningMenu, MF_STRING, 6, "Age restrictions");
     AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hWarningMenu, "Warning");
+
+    // Game Controls
+    AppendMenu(hMenu, MF_STRING, 7, "Add +1 hp");
     SetMenu(wmInfo.info.win.window, hMenu);
 }
 
@@ -126,6 +129,22 @@ Game::Game(const std::string name, int window_width, int window_height)
     SDL_FreeSurface(bgSurface);
 
 
+}
+
+void Game::Restart() {
+    // Reset game state flags
+    running = true;
+    gameOver = false;
+    inMenu = true;
+
+    // Reset game objects
+    // For players
+    for (auto& player : players_) {
+        // Assume you have methods to reset player state, such as position, health, etc.
+        player->resetState();
+    }
+
+    enemies_.clear(); 
 }
 
 void renderHealth(SDL_Renderer* renderer, int health) {
@@ -215,6 +234,13 @@ void Game::Play() noexcept {
                     break;
                 case 6: // Age restrictions
                     MessageBox(nullptr, "Please note that this game may not be suitable for all ages. Player discretion is advised.", "Age Restrictions", MB_OK);
+                    break;                
+                case 7: // +1 hp
+                    MessageBox(nullptr, "Hp will be added", "Add +1 hp", MB_OK);
+                    for (auto& character : players_) {
+                        Player* player = dynamic_cast<Player*>(character.get());
+                        player->setHealth(player->getHealth() + 1); // Increase player's health by 1
+                    }
                     break;
                 }
             }

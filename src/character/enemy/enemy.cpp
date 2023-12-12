@@ -37,16 +37,16 @@ void Enemy::moveLeft(int px_step) {
 }
 
 void Enemy::moveRight(int px_step) {
-    Character::moveLeft(px_step);
+    Character::moveRight(px_step);
 
 }
 
 void Enemy::moveUp(int px_step) {
-    Character::moveLeft(px_step);
+    Character::moveUp(px_step);
 
 }
 
 void Enemy::moveDown(int px_step) {
-    Character::moveLeft(px_step);
+    Character::moveDown(px_step);
 
 }
