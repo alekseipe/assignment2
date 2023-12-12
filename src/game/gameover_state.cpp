@@ -17,7 +17,7 @@ GameOverState::GameOverState(SDL_Renderer* renderer) : renderer_(renderer), font
 
     // Create text surface
     SDL_Color textColor = { 255, 255, 255 }; // White color
-    SDL_Surface* textSurface = TTF_RenderText_Solid(font_, "Game Over. Press R to Restart", textColor);
+    SDL_Surface* textSurface = TTF_RenderText_Solid(font_, "Game Over. Please use Win32 menu, File - Restart Game.", textColor);
     if (textSurface == nullptr) {
         std::cerr << "Unable to render text surface! SDL_ttf Error: " << TTF_GetError() << std::endl;
         return;

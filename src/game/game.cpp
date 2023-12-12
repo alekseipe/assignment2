@@ -131,21 +131,6 @@ Game::Game(const std::string name, int window_width, int window_height)
 
 }
 
-void Game::Restart() {
-    // Reset game state flags
-    running = true;
-    gameOver = false;
-    inMenu = true;
-
-    // Reset game objects
-    // For players
-    for (auto& player : players_) {
-        // Assume you have methods to reset player state, such as position, health, etc.
-        player->resetState();
-    }
-
-    enemies_.clear(); 
-}
 
 void renderHealth(SDL_Renderer* renderer, int health) {
     TTF_Font* font_ = TTF_OpenFont("./src/textures/PixelRpgFont-Regular.ttf", 28); 
@@ -185,7 +170,7 @@ Game::~Game() {
 
 }
 
-void Game::Play() noexcept {
+bool Game::Play() noexcept {
     bool running = true; // Flag to keep the game running
     bool gameOver = false; // Flag for game over state
     bool inMenu = true; // Flag for menu state
@@ -208,7 +193,7 @@ void Game::Play() noexcept {
                 switch (LOWORD(msg.wParam)) {
                 case 1: // Restart Game
                     MessageBox(nullptr, "The game will restart now.", "Restart Game", MB_OK);
-                    // Add the logic to restart the game here
+                    return true; // Signal to restart the game
                     break;
                 case 2: // Exit Application
                     MessageBox(nullptr, "The application will now close.", "Exit Application", MB_OK);
@@ -370,14 +355,14 @@ void Game::Play() noexcept {
                     break; // Break out of outer loop if game over
                 }
             }
-            for (auto& enemy : enemies_) {
-          //      enemy->moveDown(1); // Adjust this value for speed
+            for (auto& character : enemies_) {
+                Enemy* enemy = dynamic_cast<Enemy*>(character.get());
 
-                // Check if the enemy has moved past the left edge of the screen
-      //          if (enemy->getX() + enemy->getWidth() < 0) {
+                enemy->updateMoveTimer(5); 
+                if (enemy->getX() + enemy->getWidth() < 0) {
                     // Reposition the enemy to the right edge of the screen
-      //              enemy->setX(window_width_);
-       //         }
+                    enemy->setX(window_width_);
+                }
             }
 
 
@@ -401,7 +386,7 @@ void Game::Play() noexcept {
                 player->animateSprite(renderer_);
             }
             for (const auto& enemy : enemies_) {
-                enemy->updateTexturePos(renderer_);
+                enemy->animateSprite(renderer_);
             }
             SDL_RenderPresent(renderer_);
         }
@@ -412,4 +397,6 @@ void Game::Play() noexcept {
             SDL_RenderPresent(renderer_);
         }
     }
+    return false; // Signal to end the game without restarting
+
 }

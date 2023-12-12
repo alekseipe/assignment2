@@ -24,7 +24,6 @@ class Character : public GameObject {
 
     void setX(int x);
 
-
     
     void animateSprite(SDL_Renderer* renderer) noexcept override;
   
