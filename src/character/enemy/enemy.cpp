@@ -5,7 +5,7 @@
 Enemy::Enemy(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect texture_rect, std::string texture_path)
   : Character(window, renderer, std::move(texture_rect), std::move(texture_path)),
     texture_path_(std::move(texture_path)) {
-    death_texture_ = IMG_LoadTexture(renderer, "./src/textures/SkeletonKingLeftDeath.png");
+    death_texture_ = IMG_LoadTexture(renderer, "./src/textures/SorceressLefttDeath.png");
 
 }
 
@@ -48,7 +48,7 @@ void Enemy::animateSprite(SDL_Renderer* renderer) noexcept
 void Enemy::updateMoveTimer(int pix) {
   //  Uint32 current_time = SDL_GetTicks();
   //  if (current_time - last_move_time > move_delay) {
-        Character::moveLeft(pix);
+      Character::moveLeft(pix);
   //      last_move_time = current_time;  // Reset the timer
    // }
 }
@@ -75,7 +75,6 @@ void Enemy::death(SDL_Renderer* renderer) {
     SDL_RenderCopy(renderer, death_texture_, nullptr, &texture_rect_);
 
     // You could add a delay here to display the texture for a set time
-    SDL_Delay(1); // Display death animation for 500 milliseconds
 
     // Flag for deletion
     isDead = true;

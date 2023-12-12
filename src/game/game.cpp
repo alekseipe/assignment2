@@ -447,11 +447,10 @@ bool Game::Play() noexcept {
                                     else {
                                         enemy->death(renderer_);
                                         score++;
-                                        projectileHit = true;
                                         enemyIt = enemies_.erase(enemyIt);  // Remove the enemy
-                                        break;  // Assuming one projectile can only hit one enemy
                                     }
-
+                                    projectileHit = true;
+                                    break;  // Assuming one projectile can only hit one enemy
                                 }
                                 else {
                                     ++enemyIt;
@@ -467,6 +466,7 @@ bool Game::Play() noexcept {
                             ++projIt;
                         }
                     }
+
 
                     // Render player and projectiles
                     playerPtr->renderProjectiles(renderer_);
@@ -498,14 +498,14 @@ bool Game::Play() noexcept {
                 switch (enemyType) {
                 case 0: {
                     // Spawn AncientSkeleton with 1 HP
-                    AddCharacter<Enemy>(80, 80, window_width_ - 50, randomY, "./src/textures/AncientSkeletonAttack.png");
+                    AddCharacter<Enemy>(48, 48, window_width_ - 50, randomY, "./src/textures/WarriorLeftWalk.png");
                     break;
                 }
                 case 1: {
                     // Spawn GoblinRider with 2 HP
-                    auto goblinRider = std::make_unique<Enemy>(window_, renderer_, SDL_Rect{ window_width_ - 50, randomY, 80, 80 }, "./src/textures/GoblinRiderAttack.png");
-                    goblinRider->setHealth(2);
-                    enemies_.push_back(std::move(goblinRider));
+                    auto skeleton = std::make_unique<Enemy>(window_, renderer_, SDL_Rect{ window_width_ - 50, randomY, 80, 80 }, "./src/textures/AncientSkeletonAttack.png");
+                    skeleton->setHealth(2);
+                    enemies_.push_back(std::move(skeleton));
                     break;
                 }
                 case 2: {
