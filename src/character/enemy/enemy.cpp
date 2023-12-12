@@ -1,11 +1,14 @@
 #include "include/enemy.hpp"
 #include <SDL2/SDL_image.h>
+#include <iostream>
 
 Enemy::Enemy(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect texture_rect, std::string texture_path)
-  : Character(window, renderer, std::move(texture_rect), std::move(texture_path)) {
+  : Character(window, renderer, std::move(texture_rect), std::move(texture_path)),
+    texture_path_(std::move(texture_path)) {
     death_texture_ = IMG_LoadTexture(renderer, "./src/textures/SkeletonKingLeftDeath.png");
 
 }
+
 
 
 Uint32 last_frame_time1 = 0;
@@ -16,21 +19,26 @@ const Uint32 move_delay = 250;
 void Enemy::animateSprite(SDL_Renderer* renderer) noexcept
 {
     // Get the current time
+    int imageWidth = GetImageWidth(texture_path_);
+    int imageHeight = GetImageHeight(texture_path_);
+    int amountOfFrames = imageWidth / imageHeight;
+
     Uint32 current_time = SDL_GetTicks();
     if (current_time - last_frame_time1 > frame_delay) {
         // Update the frame index
-        s_curr_frame_idx = (s_curr_frame_idx + 1) % 10;
+        s_curr_frame_idx = (s_curr_frame_idx + 1) % amountOfFrames;
         // Reset the last frame time
         last_frame_time1 = current_time;
     }
 
+    int dimensions = imageHeight;
 
     // Set up the source rectangle for the current frame
     SDL_Rect src_rect;
-    src_rect.x = 64 * s_curr_frame_idx;
+    src_rect.x = dimensions * s_curr_frame_idx;
     src_rect.y = 0;
-    src_rect.w = 64;
-    src_rect.h = 64;
+    src_rect.w = dimensions;
+    src_rect.h = dimensions;
 
 
     // Render the current frame
@@ -38,11 +46,11 @@ void Enemy::animateSprite(SDL_Renderer* renderer) noexcept
 }
 
 void Enemy::updateMoveTimer(int pix) {
-    Uint32 current_time = SDL_GetTicks();
-    if (current_time - last_move_time > move_delay) {
+  //  Uint32 current_time = SDL_GetTicks();
+  //  if (current_time - last_move_time > move_delay) {
         Character::moveLeft(pix);
-        last_move_time = current_time;  // Reset the timer
-    }
+  //      last_move_time = current_time;  // Reset the timer
+   // }
 }
 void Enemy::moveLeft(int px_step) {
     Character::moveLeft(px_step);

@@ -212,7 +212,7 @@ bool Game::Play() noexcept {
     int score = 0;
 
     Uint32 last_spawn_time = 0;
-    const Uint32 initial_spawn_delay = 1000;
+    const Uint32 initial_spawn_delay = 3000;
     Uint32 spawn_delay = initial_spawn_delay;
     while (running) { // Main game loop
         healthCollectable.render(renderer_);
@@ -368,7 +368,7 @@ bool Game::Play() noexcept {
                         player->setHealth(player->getHealth() + 1); // Increase player's health by 1
                     }
                 }
-               
+
                 for (auto& character : players_) {
                     Player* player = dynamic_cast<Player*>(character.get());
                     if (player) {
@@ -377,10 +377,10 @@ bool Game::Play() noexcept {
                 }
 
 
-                
+
                 for (const auto& enemy : enemies_) {
-                    SDL_Rect enemyRect = enemy->getRect(); 
-                    SDL_Rect playerRect = player->getRect(); 
+                    SDL_Rect enemyRect = enemy->getRect();
+                    SDL_Rect playerRect = player->getRect();
 
                     if (SDL_HasIntersection(&playerRect, &enemyRect)) {
                         if ((player->getHealth() > 0)) {
@@ -388,10 +388,10 @@ bool Game::Play() noexcept {
                             enemy->death(renderer_);
                         }
                         if ((player->getHealth() == 0)) {
-                            gameOver = true; 
+                            gameOver = true;
                             break;
                         }
-                        
+
                     }
                 }
                 if (gameOver) {
@@ -401,10 +401,17 @@ bool Game::Play() noexcept {
             for (auto& enemyPtr : enemies_) {
                 Enemy* enemy = dynamic_cast<Enemy*>(enemyPtr.get());
                 if (enemy) {
-                    enemy->updateMoveTimer(10); // Update enemy movement
+                    enemy->updateMoveTimer(1); // Update enemy movement
+                    if (enemy->getX() <= 0) {
+                        enemy->death(renderer_); // Trigger death animation
+                        // Remove the enemy from the vector
+                        continue; // Skip the rest of the loop for this enemy
+                    }
+
                     if (enemy->getX() + enemy->getWidth() < 0) {
                         enemy->setX(window_width_); // Reposition the enemy to the right edge of the screen
                     }
+
                     enemy->animateSprite(renderer_); // Animate the enemy
                 }
             }
@@ -432,11 +439,19 @@ bool Game::Play() noexcept {
                             if (enemy) {
                                 SDL_Rect enemyRect = enemy->getRect();  // Store the result in a local variable
                                 if (SDL_HasIntersection(&projectileRect, &enemyRect)) {
-                                    enemy->death(renderer_);
-                                    score++;
-                                    projectileHit = true;
-                                    enemyIt = enemies_.erase(enemyIt);  // Remove the enemy
-                                    break;  // Assuming one projectile can only hit one enemy
+                                    int enemyHealth = enemy->getHealth();
+                                    enemyHealth = enemyHealth - 1;
+                                    if (enemyHealth > 0) {
+                                        enemy->setHealth(enemyHealth);
+                                    }
+                                    else {
+                                        enemy->death(renderer_);
+                                        score++;
+                                        projectileHit = true;
+                                        enemyIt = enemies_.erase(enemyIt);  // Remove the enemy
+                                        break;  // Assuming one projectile can only hit one enemy
+                                    }
+
                                 }
                                 else {
                                     ++enemyIt;
@@ -475,16 +490,43 @@ bool Game::Play() noexcept {
             Uint32 current_time = SDL_GetTicks();
             if (current_time - last_spawn_time > spawn_delay) {
                 // Randomly generate Y position for the new enemy
-                int randomY = rand() % (window_height_ - 64); // Assuming enemyHeight is the height of your enemy sprite
-                AddCharacter<Enemy>(64, 64, window_width_ - 50, randomY, "./src/textures/SkeletonKingLeftAttack.png");
+                int randomY = rand() % (window_height_ - 64); // Assuming 64 is the max height of your enemy sprites
 
-                // Increase spawn rate over time for difficulty (optional)
+                // Randomly choose the type of enemy to spawn
+                int enemyType = rand() % 4; // Generates a number between 0 and 3
+
+                switch (enemyType) {
+                case 0: {
+                    // Spawn AncientSkeleton with 1 HP
+                    AddCharacter<Enemy>(80, 80, window_width_ - 50, randomY, "./src/textures/AncientSkeletonAttack.png");
+                    break;
+                }
+                case 1: {
+                    // Spawn GoblinRider with 2 HP
+                    auto goblinRider = std::make_unique<Enemy>(window_, renderer_, SDL_Rect{ window_width_ - 50, randomY, 80, 80 }, "./src/textures/GoblinRiderAttack.png");
+                    goblinRider->setHealth(2);
+                    enemies_.push_back(std::move(goblinRider));
+                    break;
+                }
+                case 2: {
+                    // Spawn GoblinBeast with 1 HP
+                    AddCharacter<Enemy>(48, 48, window_width_ - 50, randomY, "./src/textures/GoblinBeastAttack.png");
+                    break;
+                }
+                case 3: {
+                    // Spawn Sorceress with 1 HP
+                    AddCharacter<Enemy>(48, 48, window_width_ - 50, randomY, "./src/textures/SorceressLeftAttack.png");
+                    break;
+                }
+                }
+
                 if (spawn_delay > 50) {
-                    spawn_delay = spawn_delay - 5; // Decrease delay but not less than 500 ms
+                    spawn_delay -= 30; // Decrease delay but not less than 50 ms
                 }
 
                 last_spawn_time = current_time;
             }
+
 
             SDL_RenderPresent(renderer_);
         }

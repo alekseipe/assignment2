@@ -30,6 +30,10 @@ class Character : public GameObject {
 
     virtual void death(SDL_Renderer* renderer);
 
+    int GetImageWidth(const std::string& filePath);
+
+    int GetImageHeight(const std::string& filePath);
+
     bool isDead = false;
 
     void animateSprite(SDL_Renderer* renderer) noexcept override;
@@ -40,3 +44,5 @@ class Character : public GameObject {
   protected:
     Character(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect &&texture_rect, std::string &&texture_path);
 };
+
+

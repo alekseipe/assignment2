@@ -13,6 +13,7 @@ class Enemy final : public Character {
   void moveUp(int px_step) override;
   void moveDown(int px_step) override;
   void death(SDL_Renderer* renderer) override;
+  std::string texture_path_;
 
 private:
     static inline size_t s_curr_frame_idx = 0;

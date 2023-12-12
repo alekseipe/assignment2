@@ -31,32 +31,6 @@ Player::Player(SDL_Window* window, SDL_Renderer* renderer, SDL_Rect texture_rect
 static Uint32 last_frame_time = 0;
 const Uint32 frame_delay = 100; 
 
-int GetImageWidth(const std::string& filePath) {
-    // Initialize SDL_image
-    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
-        std::cerr << "IMG_Init Error: " << IMG_GetError() << std::endl;
-        return -1;
-    }
-
-    // Load the image into an SDL_Surface
-    SDL_Surface* imageSurface = IMG_Load(filePath.c_str());
-    if (!imageSurface) {
-        std::cerr << "IMG_Load Error: " << IMG_GetError() << std::endl;
-        IMG_Quit();
-        return -1;
-    }
-
-    // Get the width of the image
-    int width = imageSurface->w;
-
-    // Clean up the surface
-    SDL_FreeSurface(imageSurface);
-
-    // Quit SDL_image
-    IMG_Quit();
-
-    return width;
-}
 void Player::animateSprite(SDL_Renderer* renderer) noexcept 
 {
     // Get the current time
@@ -64,10 +38,12 @@ void Player::animateSprite(SDL_Renderer* renderer) noexcept
 
     Uint32 current_time = SDL_GetTicks();
     int imageWidth = GetImageWidth(texture_path_);
-    int amountOfFrames = imageWidth / 48;
+    int imageHeight = GetImageHeight(texture_path_);
+
+    int amountOfFrames = imageWidth / imageHeight;
     if (current_time - last_frame_time > frame_delay) {
         // Update the frame index
-        s_curr_frame_idx = (s_curr_frame_idx + 1) % 4;
+        s_curr_frame_idx = (s_curr_frame_idx + 1) % amountOfFrames;
         // Reset the last frame time
         last_frame_time = current_time;
     }

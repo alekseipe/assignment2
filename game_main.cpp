@@ -6,7 +6,7 @@ int main() {
     do {
         Game game("Game by 13837", 1000, 1000);
         game.AddCharacter<Player>(48, 48, 0, 50, "./src/textures/WarriorRightIdle.png");
-        game.AddCharacter<Enemy>(64, 64, 800, 0, "./src/textures/SkeletonKingLeftAttack.png");
+        game.AddCharacter<Enemy>(80, 80, 800, 0, "./src/textures/AncientSkeletonAttack.png");
         restart = game.Play(); // Play the game and check if restart is needed
     } while (restart);
 
